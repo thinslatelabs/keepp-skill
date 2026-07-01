@@ -1,15 +1,15 @@
 ---
-name: keepp-storefront
-description: Use when a user wants to build or manage their Keepp storefront — adding, updating, or removing product cards (products, affiliate items, promo-code deals, lead-capture cards), or changing storefront settings like layout mode, hero button, card defaults, or theme — through the Keepp Agent API. Requires a Keepp Pro API key (keepp_live_…).
+name: keepp-page
+description: Use when a user wants to build or manage their Keepp page — adding, updating, or removing product cards (products, affiliate items, promo-code deals, lead-capture cards), or changing page settings like layout mode, hero button, card defaults, or theme — through the Keepp Agent API. Requires a Keepp Pro API key (keepp_live_…).
 ---
 
-# Managing a Keepp Storefront
+# Managing a Keepp Page
 
 ## What Keepp is
 
-Keepp turns a creator's or small business's social bio link into a **storefront**: a shareable page of product "cards" plus links, built to turn followers into buyers and leads. It's used by sellers, affiliates, coaches, course creators, and link-in-bio creators across Instagram, YouTube, TikTok, Pinterest, and X.
+Keepp turns a creator's or small business's social bio link into a **page**: a shareable collection of product "cards" plus links, built to turn followers into buyers and leads. It's used by sellers, affiliates, coaches, course creators, and link-in-bio creators across Instagram, YouTube, TikTok, Pinterest, and X.
 
-A storefront is made of:
+A Keepp page is made of:
 - **Profile** — avatar, display name, short bio
 - **Social icons** — links to the owner's social accounts
 - **Link blocks** — buttons to a website, booking page, WhatsApp, etc. (plus section headers)
@@ -21,9 +21,9 @@ A storefront is made of:
 This API manages two things:
 
 1. **Catalog cards (posts)** — create, list, update, and delete the product cards in the owner's catalog.
-2. **Storefront settings** — the storefront's layout mode, about text, hero CTA, catalog-card defaults, and theme (see "Storefront settings" below).
+2. **Page settings** — the page's layout mode, about text, hero CTA, catalog-card defaults, and theme (see "Page settings" below).
 
-You CANNOT change these through this API: **social icons**, **link blocks**, and **profile details** (display name, avatar, store URL). Those are set by the owner in the Keepp dashboard — if a user asks for them, point them to **Storefront → Settings / Links**.
+You CANNOT change these through this API: **social icons**, **link blocks**, and **profile details** (display name, avatar, page URL). Those are set by the owner in the Keepp dashboard — if a user asks for them, point them to the Keepp dashboard.
 
 ## Authentication
 
@@ -61,7 +61,7 @@ A card is created/updated with three top-level fields: `imageUrls`, `userContent
     "links": ["https://…"],                // extra links shown on the card (optional)
     "contacts": [{ "type": "whatsapp", "value": "+15551234567" }]   // optional
   },
-  "cardOverrides": {                       // how the card behaves (optional; omit to inherit storefront defaults)
+  "cardOverrides": {                       // how the card behaves (optional; omit to inherit page defaults)
     "clickAction": "open_detail",          // "open_detail" | "trigger_cta"
     "ctaType": "link",                     // "message" | "link" | "lead_collection"
     "ctaUrl": "https://shop…/scarf",       // REQUIRED when ctaType = "link"
@@ -70,7 +70,7 @@ A card is created/updated with three top-level fields: `imageUrls`, `userContent
 }
 ```
 
-`description` is the only required field. Everything else is optional; omitting `cardOverrides` inherits the owner's storefront-wide defaults.
+`description` is the only required field. Everything else is optional; omitting `cardOverrides` inherits the owner's page-wide defaults.
 
 **Categories:** clothing, jewellery, accessories, home_decor, beauty, food_beverage, art, stationery, plants, fitness, travel, real_estate, services, pets, kids_baby, books_media, crafts, other.
 
@@ -85,17 +85,17 @@ A card is created/updated with three top-level fields: `imageUrls`, `userContent
 **2. `ctaType` — what the CTA does:**
 - `message` — opens a message to the business. A safe default when there's no checkout link.
 - `link` — opens `ctaUrl` (a Shopify/Etsy page, an affiliate link, a booking page, a Google Form). Requires `ctaUrl`. Use when there's a dedicated destination.
-- `lead_collection` — opens a short form on the storefront that captures the visitor's contact details and saves them as a lead. Use to capture people who aren't ready to buy (waitlists, sales lists, coaching enquiries). The fields collected are set storefront-wide via `catalogCard.leadCollection` on the storefront-settings endpoint (see below) — they apply to all cards, not per card.
+- `lead_collection` — opens a short form on the page that captures the visitor's contact details and saves them as a lead. Use to capture people who aren't ready to buy (waitlists, sales lists, coaching enquiries). The fields collected are set page-wide via `catalogCard.leadCollection` on the page-settings endpoint (see below) — they apply to all cards, not per card.
 
 Set `ctaLabel` to match the action: "Buy now", "Order now", "Get the lookbook", "Reserve yours", "Get notified".
 
-## Storefront settings
+## Page settings
 
-Read and change the storefront's overall configuration.
+Read and change the page's overall configuration.
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| GET | `/api/v1/storefront` | Get the current storefront settings. |
+| GET | `/api/v1/storefront` | Get the current page settings. |
 | PATCH | `/api/v1/storefront` | Change settings. Send only the fields you want to change — they merge onto the current config. |
 
 Editable fields:
@@ -103,13 +103,13 @@ Editable fields:
 ```jsonc
 {
   "mode": "links_and_catalog",   // "links_only" | "catalog_only" | "links_and_catalog"
-  "about": "Handmade ceramics from my studio in Lisbon.",  // short storefront tagline (≤280 chars)
-  "mainCta": {                    // hero button at the top of the store
+  "about": "Handmade ceramics from my studio in Lisbon.",  // short page tagline (≤280 chars)
+  "mainCta": {                    // hero button at the top of the page
     "enabled": true,
     "label": "Book a call",
     "url": "https://cal.com/me"   // required when enabled
   },
-  "catalogCard": {                // storefront-wide DEFAULTS for every card
+  "catalogCard": {                // page-wide DEFAULTS for every card
     "showCardDetails": true,
     "clickAction": "open_detail", // "open_detail" | "trigger_cta"
     "ctaType": "message",         // "message" | "link" | "lead_collection"
@@ -128,7 +128,7 @@ Editable fields:
 - **Partial updates merge.** `PATCH {"theme":{"useCustomTheme":true,"brandColor":"#000000"}}` changes only the theme; mode, cards, etc. stay as they were.
 - **Theme guard:** `preset`/`brandColor` are ignored unless `useCustomTheme` is `true` — send it in the same request.
 - **`catalogCard` is the default for all cards.** A card's own `cardOverrides` (above) wins over these. Change these to restyle every card at once.
-- **`leadCollection`** sets which fields the storefront-wide lead form collects (there is no per-card field choice).
+- **`leadCollection`** sets which fields the page-wide lead form collects (there is no per-card field choice).
 - Invalid combinations are rejected with `400 INVALID_STOREFRONT_CONFIG` (e.g. `ctaType:"link"` without `ctaUrl`).
 
 ## Use-case recipes
@@ -174,12 +174,12 @@ Success: `{ "ok": true, "data": { … } }`. Error: `{ "ok": false, "error": { "c
 - Confirm with the user before deleting cards.
 - Set `price` and `promoCode` whenever you have them — they render on the card and in the detail view and are central to affiliate and sale use cases.
 - When bulk-creating, stay under 60 requests per minute.
-- Cards publish to the storefront immediately.
-- You can manage cards and storefront settings (mode, about, hero CTA, card defaults, theme). For links, social icons, and profile details (name, avatar, store URL), tell the user to use the Keepp dashboard.
+- Cards publish to the page immediately.
+- You can manage cards and page settings (mode, about, hero CTA, card defaults, theme). For links, social icons, and profile details (name, avatar, page URL), tell the user to use the Keepp dashboard.
 
 ## More context
 
-Keepp's how-to guides explain the storefront in depth:
-- Choosing a storefront mode: https://keepp.link/blog/how-to/05-choosing-your-storefront-mode
+Keepp's how-to guides explain a Keepp page in depth:
+- Choosing your layout mode: https://keepp.link/blog/how-to/05-choosing-your-storefront-mode
 - How product cards look and behave: https://keepp.link/blog/how-to/06-configuring-how-product-cards-look-and-behave
 - Per-post CTAs and custom links: https://keepp.link/blog/how-to/07-setting-per-post-ctas-and-custom-links
