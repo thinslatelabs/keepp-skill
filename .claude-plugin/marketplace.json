@@ -1,0 +1,14 @@
+{
+  "name": "keepp",
+  "owner": {
+    "name": "ThinSlate Labs",
+    "url": "https://keepp.link"
+  },
+  "plugins": [
+    {
+      "name": "keepp",
+      "source": "./plugins/keepp",
+      "description": "Manage a Keepp page (product cards, promo codes, lead capture, page settings) via the Keepp Agent API."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "keepp",
+  "description": "Manage a Keepp page (product cards, promo codes, lead capture, page settings) via the Keepp Agent API.",
+  "version": "1.0.0",
+  "author": {
+    "name": "ThinSlate Labs",
+    "url": "https://keepp.link"
+  },
+  "homepage": "https://keepp.link/developers",
+  "license": "MIT",
+  "keywords": ["keepp", "link-in-bio", "storefront", "agent", "api"]
+}
