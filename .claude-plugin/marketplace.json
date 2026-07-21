@@ -8,7 +8,7 @@
     {
       "name": "keepp",
       "source": "./plugins/keepp",
-      "description": "Manage a Keepp page (product cards, promo codes, lead capture, page settings) via the Keepp Agent API."
+      "description": "Build and manage a whole Keepp page — blocks, layout, and theme — via the Keepp Agent API."
     }
   ]
 }

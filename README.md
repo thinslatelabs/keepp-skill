@@ -1,17 +1,17 @@
 # Keepp Page Skill
 
-An [Agent Skill](https://agentskills.io/specification) — packaged as a Claude Code plugin — that teaches an LLM to build and manage a **[Keepp](https://keepp.link)** page through the Keepp Agent API: creating and updating product cards (including affiliate items with promo codes and lead-capture cards) and editing page settings.
+An [Agent Skill](https://agentskills.io/specification) — packaged as a Claude Code plugin — that teaches an LLM to build and manage a **[Keepp](https://keepp.link)** page through the Keepp Agent API: adding and arranging the blocks a page is made of, writing the copy, placing products and bookings, and styling the theme.
 
 The skill itself is [`plugins/keepp/skills/keepp-page/SKILL.md`](./plugins/keepp/skills/keepp-page/SKILL.md).
 
 ## What it does
 
-Given a Keepp Pro API key, an agent using this skill can:
+A Keepp page is an ordered list of blocks on a two-column grid — links, preview links, cards, headers, text, profile, social icons, forms, maps, products, and bookings. Given a Keepp Pro API key, an agent using this skill can:
 
-- **Manage catalog cards** — create, list, update, and delete product cards, each with a title, description, price, promo/referral code, category, images, and call-to-action behaviour.
-- **Edit page settings** — the layout mode, about text, hero button, page-wide card defaults, and theme.
+- **Build and edit the whole page** — add, remove, reorder, and restyle any block, and set the page theme.
+- **Place products and bookings** the owner has created. These are read-only to the agent: it can put them on the page, but it can never create one or publish a price the owner didn't set.
 
-It also teaches the *judgment* behind these — when to send a buyer to an external link vs. capture a lead, when to show a detail view vs. fire the CTA directly, and how card defaults relate to per-card overrides.
+It also teaches the *judgment* behind these — when a plain link beats a product card, when a page has grown long enough to need sections and nav tabs, when an on-page form converts better than a link to one — and the one rule that matters most: a write replaces the whole page, so always read it first and send every block back.
 
 ## Requirements
 
