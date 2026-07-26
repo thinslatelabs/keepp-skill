@@ -6,9 +6,10 @@ The skill itself is [`plugins/keepp/skills/keepp-page/SKILL.md`](./plugins/keepp
 
 ## What it does
 
-A Keepp page is an ordered list of blocks on a two-column grid — links, preview links, cards, headers, text, profile, social icons, forms, maps, products, and bookings. Given a Keepp Pro API key, an agent using this skill can:
+A Keepp page is an ordered list of blocks on a two-column grid — links, cards, headers, text, profile, social icons, forms, maps, YouTube videos, menus, tickers, products, and bookings. Given a Keepp Pro API key, an agent using this skill can:
 
-- **Build and edit the whole page** — add, remove, reorder, and restyle any block, and set the page theme.
+- **Build and edit the whole page** — add, remove, reorder, and restyle any block, and set the page theme (colors, roundedness, font pairing, background).
+- **Schedule blocks** to appear and disappear on their own, in the owner's time zone.
 - **Place products and bookings** the owner has created. These are read-only to the agent: it can put them on the page, but it can never create one or publish a price the owner didn't set.
 
 It also teaches the *judgment* behind these — when a plain link beats a product card, when a page has grown long enough to need sections and nav tabs, when an on-page form converts better than a link to one — and the one rule that matters most: a write replaces the whole page, so always read it first and send every block back.
