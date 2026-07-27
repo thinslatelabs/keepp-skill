@@ -113,14 +113,14 @@ For a custom image instead, use `iconUrl`.
 
 ### Card kinds
 
-`card` needs a `kind`, and each kind requires a different field:
+`card` needs a `kind`, and each kind requires a different field. Every kind opens the same detail dialog on tap, and if `ctaUrl` is set a CTA button also appears on the card face, linking out in a new tab without opening the dialog:
 
-- `"showcase"` — shows something off. Optional `ctaUrl` makes the whole card a link.
-- `"for-sale"` — requires `price`, free text (`"₹2,400"`, `"From $40"`). Opens a detail view.
-- `"affiliate-link"` — requires `ctaUrl`, the affiliate destination.
-- `"promo-code"` — requires `code`. Tapping copies it.
+- `"showcase"` — shows something off, no required field beyond `kind`. The only kind where `title` is optional.
+- `"for-sale"` — requires `title` and `price`, free text (`"₹2,400"`, `"From $40"`).
+- `"affiliate-link"` — requires `title` and `ctaUrl`, the affiliate destination.
+- `"promo-code"` — requires `title` and `code`. The code chip on the card face still copies directly when tapped; tapping anywhere else on the card opens the dialog (where the code is also available).
 
-Optional on all kinds: `mediaUrls` (array), `description`, `ctaLabel`, `aspect: "portrait"` for 4:5 images.
+Optional on all kinds: `mediaUrls` (array), `description`, `additionalInfo` (shown in the dialog), `ctaLabel`, `aspect: "portrait"` for 4:5 images.
 
 **`card` is for things sold elsewhere.** For something sold *on* the page through Stripe, use a `product` block.
 
