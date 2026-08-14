@@ -86,9 +86,9 @@ Every block has `type`, `size`, an optional `align`, an optional `style`, an opt
 | `nav` | full | yes | – | – **singleton**, tabs built from headers with `showInNav` |
 | `spacer` | full | – | – | – |
 | `form` | full | – | pill\|card (default pill) | `preset`*, `title`*, `fields`*, `description` (shown on the card), `triggerLabel`, `submitLabel`, `successMessage`, `verification` |
-| `booking` | half, full | yes | card\|pill (default card) | `bookingUnitId`* — everything else server-filled |
-| `product` | half, full | yes | card\|pill (default card) | `productId`* — everything else server-filled |
-| `map` | half, full | yes | card only | `embedSrc`*, `title`, `address`, `hours` |
+| `booking` | half, full | yes | card\|pill (default card) | `bookingUnitId`*, `aspect` — everything else server-filled |
+| `product` | half, full | yes | card\|pill (default card) | `productId`*, `aspect` — everything else server-filled |
+| `map` | half, full | yes | card only | `embedSrc`* (see below), `title`, `address`, `hours` |
 | `youtube` | half, full | yes | card only | `videoId`*, `title`, `description` |
 | `ticker` | full | – | – | `text`* (300 chars max), `direction`: `"rtl" \| "ltr"`, `speed`: `"slow" \| "normal" \| "fast"`, `pauseOnHover` |
 | `menu` | half, full | yes | pill\|card (default pill) | `title`*, `subtitle`, `triggerLabel`, `imageUrl`, `items` |
@@ -98,6 +98,16 @@ Every block has `type`, `size`, an optional `align`, an optional `style`, an opt
 ### YouTube
 
 `videoId` accepts any single-video YouTube link — `watch?v=`, `youtu.be/`, `/shorts/`, `/live/`, `/embed/` — or the bare 11-character id, and is **stored as the bare id**. Playlists and channels are rejected. The card shows the video's thumbnail; tapping it opens the player. Send only `videoId`; the thumbnail and the "Watch on YouTube" link are derived from it.
+
+### Map
+
+`embedSrc` must be the **embed** URL Google Maps hands out under Share → Embed a map — origin and path are allowlisted exactly:
+
+```
+https://www.google.com/maps/embed?pb=…
+```
+
+An ordinary maps link is rejected, including `google.com/maps?q=…&output=embed`, a `maps.app.goo.gl` short link, or any other host. The `?pb=` blob is opaque and stored verbatim, so pass it through unchanged rather than trying to rebuild it from a place name.
 
 ### Menu
 
@@ -120,7 +130,7 @@ For a custom image instead, use `iconUrl`.
 - `"affiliate-link"` — requires `title` and `ctaUrl`, the affiliate destination.
 - `"promo-code"` — requires `title` and `code`. The code chip on the card face still copies directly when tapped; tapping anywhere else on the card opens the dialog (where the code is also available).
 
-Optional on all kinds: `mediaUrls` (array), `description`, `additionalInfo` (shown in the dialog), `ctaLabel`, `aspect: "portrait"` for 4:5 images.
+Optional on all kinds: `mediaUrls` (array), `description`, `additionalInfo` (shown in the dialog), `ctaLabel`, and `aspect` — `"wide"` (16:9), `"square"` (the default, omit it), or `"tall"` (4:5). `product` and `booking` accept the same `aspect`. `"portrait"` is the former name for `"tall"` and is still accepted on input.
 
 **`card` is for things sold elsewhere.** For something sold *on* the page through Stripe, use a `product` block.
 
@@ -128,7 +138,15 @@ Optional on all kinds: `mediaUrls` (array), `description`, `additionalInfo` (sho
 
 `form` needs `preset`: `"lead"`, `"feedback"`, or `"form"`, a `title`, plus a `fields` array of `{ id, label, type, required }` where `id` is a UUID you generate. Submissions land in the owner's dashboard.
 
-`type` is one of `short_text`, `long_text`, `email`, `phone`, `single_select`, `multi_select`, `product_interest`, `social_handles`, `rating`. The select types also take an `options` array.
+`type` is one of `short_text`, `long_text`, `email`, `phone`, `single_select`, `multi_select`, `product_interest`, `social_handles`, `rating`. Three types need a companion key, and the whole `PUT` is rejected without it:
+
+| type | also requires |
+|---|---|
+| `single_select`, `multi_select` | `options` — an array of strings, 30 max, 120 chars each |
+| `rating` | `ratingStyle`: `"thumb"` (up/down), `"stars_5"`, or `"scale_10"` |
+| `product_interest` | `productSource`: `"all_cards"`, `"specific"`, or `"free_text"` |
+
+`productSource: "specific"` additionally needs the product ids to offer, and `"free_text"` needs `productItems` — a list of plain strings. `"all_cards"` needs nothing else and derives its choices from the cards already on the page.
 
 **Exactly one field must carry `isIdentifier: true`**, and only an `email` or `phone` field may be the identifier — it's how submissions are attributed to a person. Send none, or send two, and the whole `PUT` is rejected. This is the most common way a hand-built `form` block fails.
 
@@ -180,6 +198,21 @@ If the user asks you to create a product or change a price, tell them to do it i
 Send a public `https://` image URL in `mediaUrls`, `imageUrl`, or `iconUrl` and the server fetches and stores it. Paths already starting with `/uploads/` are stored — **send those back unchanged**.
 
 A URL that can't be fetched, isn't an image, is too large, or resolves to a private address returns `422 INVALID_IMAGE`.
+
+**There is no upload endpoint — a public URL is the only way in.** A local file, a
+path on the user's machine, or an image you generated in this session cannot be
+sent directly. When the user has no URL for the image they want, say so and offer
+the two ways forward rather than stalling:
+
+1. **Ask them for a URL.** Anything already public works — their own site, a
+   social post, a CDN, a Drive/Dropbox link set to public.
+2. **Put it somewhere public first.** Any image or file host that hands back a
+   direct `https://` link to the image itself will do; the server only needs to
+   fetch it once, at `PUT` time, after which the image lives in Keepp and the
+   temporary copy can go.
+
+The link must resolve to the image, not to a viewer page wrapped around it — a
+share page returns HTML and fails as `422 INVALID_IMAGE`.
 
 ## Theme
 
