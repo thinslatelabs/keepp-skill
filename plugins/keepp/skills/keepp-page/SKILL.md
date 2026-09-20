@@ -62,136 +62,26 @@ Every block has an `id` (a UUID). **Keep the ids of blocks you received** — th
 
 Pass the `version` from your `GET` to make the write fail rather than overwrite someone editing at the same moment — you'll get `409 VERSION_CONFLICT`, then re-`GET` and reapply. Omit `version` and your write always wins.
 
-## Block types
+## What a page can contain, and how to build one well
 
-Every block has `type`, `size`, an optional `align`, an optional `style`, an optional `schedule`, and — on the types that support it — an optional `shape`.
-
-- `size`: `"full"` or `"half"` — most types only allow `full` (see the table).
-- `align`: `"left" | "center" | "right"` — only on the types marked below.
-- `style`: `{ "bg": "#hex", "text": "#hex" }` — per-block color override, silently dropped on types that can't render it.
-- `shape`: `"pill" | "card"` — only on `link`, `card`, `form`, `booking`, `product`, `menu` (and `map` and `youtube`, which are card-only and accept no other value). Sending `shape` on a type without a shape axis is rejected, not ignored — leave it out entirely for `header`, `subheader`, `text`, `profile-circle`, `profile-square`, `social-icons`, `profile-cta`, `nav`, `spacer`, and `ticker`.
-- `schedule`: every type accepts one — see [Scheduling](#scheduling).
-
-| type | sizes | align? | shape? | content fields |
-|---|---|---|---|---|
-| `link` | half, full | yes | pill\|card (default pill) | `title`*, `url`*, `imageUrl`* (card only), `icon` (pill only — see below), `iconUrl` (pill only) |
-| `card` | half, full | yes | card\|pill (default card) | `kind`*, `title`*, `mediaUrls`, `description`, `additionalInfo`, `ctaLabel`, `aspect`, `icon`, + per-kind (below) |
-| `header` | full | yes | – | `text`*, `showInNav`, `variant`: `"plain" \| "eyebrow" \| "divider"` |
-| `subheader` | full | yes | – | `text`*, `variant`: `"plain" \| "eyebrow" \| "divider"` |
-| `text` | full | yes | – | `text`* |
-| `profile-circle` | full | – | – | `name`, `about`, `imageUrl` |
-| `profile-square` | full | – | – | `name`, `about`, `imageUrl` |
-| `social-icons` | full | – | – | `icons`* — array of `{ id, platform, url }` |
-| `profile-cta` | full | – | – | `label`*, `url` — **singleton** |
-| `nav` | full | yes | – | – **singleton**, tabs built from headers with `showInNav` |
-| `spacer` | full | – | – | – |
-| `form` | full | – | pill\|card (default pill) | `preset`*, `title`*, `fields`*, `description` (shown on the card), `triggerLabel`, `submitLabel`, `successMessage`, `verification` |
-| `booking` | half, full | yes | card\|pill (default card) | `bookingUnitId`*, `aspect` — everything else server-filled |
-| `product` | half, full | yes | card\|pill (default card) | `productId`*, `aspect` — everything else server-filled |
-| `map` | half, full | yes | card only | `embedSrc`* (see below), `title`, `address`, `hours` |
-| `youtube` | half, full | yes | card only | `videoId`*, `title`, `description` |
-| `ticker` | full | – | – | `text`* (300 chars max), `direction`: `"rtl" \| "ltr"`, `speed`: `"slow" \| "normal" \| "fast"`, `pauseOnHover` |
-| `menu` | half, full | yes | pill\|card (default pill) | `title`*, `subtitle`, `triggerLabel`, `imageUrl`, `items` |
-
-`*` = required. `profile-cta` and `nav` are **singletons** — at most one of each per page.
-
-### YouTube
-
-`videoId` accepts any single-video YouTube link — `watch?v=`, `youtu.be/`, `/shorts/`, `/live/`, `/embed/` — or the bare 11-character id, and is **stored as the bare id**. Playlists and channels are rejected. The card shows the video's thumbnail; tapping it opens the player. Send only `videoId`; the thumbnail and the "Watch on YouTube" link are derived from it.
-
-### Map
-
-`embedSrc` must be the **embed** URL Google Maps hands out under Share → Embed a map — origin and path are allowlisted exactly:
+**Do not guess at block shapes, and do not work from a list written here.** Both the block
+vocabulary and the guidance on composing a page are published, and both are derived from the
+product itself rather than maintained by hand:
 
 ```
-https://www.google.com/maps/embed?pb=…
+GET https://keepp.link/api/v1/capabilities     (public, no key needed)
 ```
 
-An ordinary maps link is rejected, including `google.com/maps?q=…&output=embed`, a `maps.app.goo.gl` short link, or any other host. The `?pb=` blob is opaque and stored verbatim, so pass it through unchanged rather than trying to rebuild it from a place name.
+It returns two things:
 
-### Menu
+- **`blocks`** — every block type, the fields each one takes, which are required to publish, and
+  the sizes, alignments and shapes it accepts. Generated from the same definitions the editor and
+  the publisher use, so it cannot fall behind the product.
+- **`guidance`** — what to get right (where money is taken, what a schedule needs, what deleting
+  costs) and how to build a page somebody would be pleased to send to a stranger.
 
-`items` is an array of `{ name, description?, price?, tags? }` — 100 items max, 50 words per description, 10 distinct tags across the menu. `imageUrl` is stored as `mediaUrls`, so a later `GET` returns it there; send it back either way.
-
-### Link icons
-
-`icon` on a pill-shaped `link` is one of a fixed set, and it is **not** the social-platform list — sending `"instagram"` is rejected:
-
-`shopping-bag`, `shopping-cart`, `store`, `tag`, `badge-percent`, `gift`, `package`, `truck`, `credit-card`, `wallet`, `calendar`, `clock`, `bell`, `ticket`, `message-circle`, `mail`, `phone`, `video`, `music`, `headphones`, `mic`, `camera`, `image`, `play-circle`, `download`, `file-text`, `book-open`, `graduation-cap`, `map-pin`, `globe`, `link`, `heart`, `star`, `sparkles`, `award`, `users`, `coffee`, `utensils`, `palette`, `dumbbell`
-
-For a custom image instead, use `iconUrl`.
-
-### Card kinds
-
-`card` needs a `kind`, and each kind requires a different field. Every kind opens the same detail dialog on tap, and if `ctaUrl` is set a CTA button also appears on the card face, linking out in a new tab without opening the dialog:
-
-- `"showcase"` — shows something off, no required field beyond `kind`. The only kind where `title` is optional.
-- `"for-sale"` — requires `title` and `price`, free text (`"₹2,400"`, `"From $40"`).
-- `"affiliate-link"` — requires `title` and `ctaUrl`, the affiliate destination.
-- `"promo-code"` — requires `title` and `code`. The code chip on the card face still copies directly when tapped; tapping anywhere else on the card opens the dialog (where the code is also available).
-
-Optional on all kinds: `mediaUrls` (array), `description`, `additionalInfo` (shown in the dialog), `ctaLabel`, and `aspect` — `"wide"` (16:9), `"square"` (the default, omit it), or `"tall"` (4:5). `product` and `booking` accept the same `aspect`. `"portrait"` is the former name for `"tall"` and is still accepted on input.
-
-**`card` is for things sold elsewhere.** For something sold *on* the page through Stripe, use a `product` block.
-
-### Form presets
-
-`form` needs `preset`: `"lead"`, `"feedback"`, or `"form"`, a `title`, plus a `fields` array of `{ id, label, type, required }` where `id` is a UUID you generate. Submissions land in the owner's dashboard.
-
-`type` is one of `short_text`, `long_text`, `email`, `phone`, `single_select`, `multi_select`, `product_interest`, `social_handles`, `rating`. Three types need a companion key, and the whole `PUT` is rejected without it:
-
-| type | also requires |
-|---|---|
-| `single_select`, `multi_select` | `options` — an array of strings, 30 max, 120 chars each |
-| `rating` | `ratingStyle`: `"thumb"` (up/down), `"stars_5"`, or `"scale_10"` |
-| `product_interest` | `productSource`: `"all_cards"`, `"specific"`, or `"free_text"` |
-
-`productSource: "specific"` additionally needs the product ids to offer, and `"free_text"` needs `productItems` — a list of plain strings. `"all_cards"` needs nothing else and derives its choices from the cards already on the page.
-
-**Exactly one field must carry `isIdentifier: true`**, and only an `email` or `phone` field may be the identifier — it's how submissions are attributed to a person. Send none, or send two, and the whole `PUT` is rejected. This is the most common way a hand-built `form` block fails.
-
-```json
-{ "type": "form", "size": "full", "preset": "lead", "title": "Work with me",
-  "fields": [
-    { "id": "…uuid…", "label": "Email", "type": "email", "required": true, "isIdentifier": true },
-    { "id": "…uuid…", "label": "What do you need?", "type": "long_text", "required": false } ] }
-```
-
-Optional `verification: { "email": true }` makes the submitter confirm their address before the submission counts.
-
-### Social icons
-
-`icons` is an array of `{ id, platform, url }` where `id` is a UUID you generate and `platform` is a known network. Keep it to a handful.
-
-## Scheduling
-
-Any block accepts an optional `schedule` and is shown only inside that window:
-
-```json
-{ "schedule": { "from": "2026-08-01T09:00", "until": "2026-08-14T23:59", "tz": "Asia/Kolkata" } }
-```
-
-- `tz` is **required** and must be an IANA zone (`"Europe/London"`, not `"GMT+1"`).
-- `from` and `until` are **local** wall-clock times, `YYYY-MM-DDTHH:mm` — no seconds, no offset, no `Z`. Deliberately local, so "9am Friday" stays 9am across a daylight-saving change.
-- At least one of `from` / `until` is required, and `until` must be after `from`.
-- Omit `schedule` entirely for an always-visible block. Sending `null` also means always-visible.
-
-The window is evaluated on the server when the page is read, so a not-yet-started block isn't in the HTML at all — it can't be found in view-source. A scheduled block still counts against the 100-block page limit.
-
-## Products and bookings are read-only
-
-`product` and `booking` blocks **reference** records the owner created in their dashboard. You place them; you cannot create them or change what they cost.
-
-Call `GET /api/v1/catalog`, then send only the reference:
-
-```json
-{ "type": "product", "size": "half", "productId": "8f2c…" }
-{ "type": "booking", "size": "full", "bookingUnitId": "1a9e…" }
-```
-
-The server fills `title`, `priceText`, `mediaUrls`, `description`, and buyability from the record. **Anything you send for those fields is overwritten** — never invent a price. A card advertising the wrong number is worse than no card at all.
-
-If the user asks you to create a product or change a price, tell them to do it in the dashboard under Products or Bookings; then you can place it.
+Read it before building a page. An earlier version of this file carried its own copy of all of
+that, and the copy drifted from the product — which is why it now lives in one place.
 
 ## Images
 
@@ -213,57 +103,6 @@ the two ways forward rather than stalling:
 
 The link must resolve to the image, not to a viewer page wrapped around it — a
 share page returns HTML and fails as `422 INVALID_IMAGE`.
-
-## Theme
-
-Optional `theme` on `PUT`:
-
-```json
-{ "roundedness": "soft", "brandColor": "#d7494c", "textColor": "#211f1b",
-  "fontPairing": "editorial",
-  "background": { "type": "color", "color": "#faf7f0" } }
-```
-
-- `roundedness`: `"flat" | "soft" | "round"`
-- `fontPairing`: `"editorial" | "bold" | "classic" | "modern" | "soft" | "handwritten" | "minimal"` — sets the page's display/body font pair. Omit it and the page keeps its current fonts; there is no "default" value to send.
-- `background.type`: `"color"` (with `color`), `"gradient"` (with `from`, `to`, optional `angle`), or `"image"` (with `imageUrl`, optional `veil`, optional `position`)
-- `background.veil`: `"none" | "light" | "strong"` — scrims an image background so text stays readable. On a busy photo, `"light"` is usually the difference between legible and not.
-- `background.position`: one of `"left top"`, `"center top"`, `"right top"`, `"left center"`, `"center center"`, `"right center"`, `"left bottom"`, `"center bottom"`, `"right bottom"`
-- Colors are 3- or 6-digit hex
-
-Unrecognised theme keys and invalid values are **silently dropped**, not rejected — so a typo in `fontPairing` leaves the fonts unchanged with no error. Re-`GET` if you need to confirm a theme change landed.
-
-## Page limit
-
-A page holds at most **100 blocks**. Over that the write is rejected with the reason and a support address. Keepp is deliberately one page — if someone wants 150 blocks, the better answer is usually a shorter, better-ordered page.
-
-## Building a good page — judgment
-
-The API will happily let you build a bad page. These are the calls worth making well.
-
-**Lead with identity.** A `profile-circle` (or `profile-square`) first, then `social-icons`. A visitor should know whose page this is before they scroll.
-
-**Link shapes vs card.** A `link` defaults to a plain button (`shape: "pill"`) — right for most destinations, and ten of them read cleanly. Set `shape: "card"` and add an `imageUrl` to give the same link a bigger, image-led presentation, worth it for the two or three things you most want clicked. A `card` block is for *merchandise* — something with a price, a code, or a look — and is a different type entirely. Don't turn every link into a card-shaped link: a wall of them reads as an ad, and the ones that matter stop standing out.
-
-**`preview-link` is deprecated.** Use `link` with `shape: "card"` in new payloads. Legacy `preview-link` payloads are still accepted, read as a card-shaped link, and written in the canonical `link` form on the next save.
-
-**Use `ticker` sparingly.** A scrolling banner earns attention by being the only one. Two tickers on a page cancel each other out.
-
-**A `youtube` block beats a link to a video.** The video plays on the page instead of sending the visitor to YouTube, where the next recommendation is a competitor. Use a plain `link` only when you actually want them on the channel.
-
-**Schedule instead of asking the owner to remember.** A sale banner, a launch block, a holiday-hours notice — set `schedule` and it appears and disappears on its own. Confirm the time zone with the user rather than assuming; the field is required and guessing it wrong shifts their launch by hours.
-
-**Prefer `product` when money changes hands on the page.** A `for-sale` card sends people elsewhere; a `product` block takes payment right there. If the owner has products in their catalog, use them.
-
-**Use `header` to break up anything long.** Past six or seven blocks a page needs sections. Set `showInNav: true` on the two or three headers that are real destinations and add one `nav` block for working tabs. Don't mark every header — four tabs is a menu, ten is a mess.
-
-**Pair your `half` blocks.** Two halves sit side by side. A lone half leaves a gap unless you `align` it; `center` usually looks deliberate.
-
-**A form beats a link to a form.** If the goal is capturing interest, a `form` block on the page converts better than a `link` to a Google Form.
-
-**Ask before deleting.** Removing a block loses its content and its share link. Confirm first, and never remove blocks the user didn't mention.
-
-**Say what you changed.** After a `PUT`, describe it plainly — "added a product block for the ceramic mug under your Shop header" — and give them the page URL from `GET`.
 
 ## Errors
 
