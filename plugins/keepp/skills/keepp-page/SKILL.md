@@ -1,9 +1,15 @@
 ---
 name: keepp-page
-description: Use when a user wants to build or manage their Keepp page — adding, arranging, or removing blocks (links, cards, products, bookings, forms, maps, YouTube videos, menus, tickers, profile, socials, headers, text), scheduling a block to appear later, changing the layout, or restyling the theme — through the Keepp Agent API. Requires a Keepp Pro API key (keepp_live_…).
+description: Use when a user wants to build or manage their Keepp page through the Keepp HTTP API with an API key (keepp_live_…) — typically from a script, a scheduled job or a custom agent. If Keepp's MCP tools (get_page, put_page, list_catalog and the rest) are available in this session, use those instead of this skill.
 ---
 
 # Building a Keepp Page
+
+> **Connected to Keepp as an MCP server?** If tools like `get_page`, `put_page` and
+> `list_catalog` are available, use them and stop reading here: the connector signs the
+> person in, carries this guidance itself, and can also create products, bookings and
+> pages. This skill is for the HTTP API with an API key, for scripts, scheduled jobs and
+> custom agents where nobody is there to sign in.
 
 ## What Keepp is
 
@@ -130,5 +136,6 @@ Fix that block and resend the whole array. A rejected `PUT` changes nothing, so 
 ## More context
 
 - Developer docs: https://keepp.link/developers
+- Connect Keepp to Claude, ChatGPT or any MCP app: https://keepp.link/blog/how-to/connect-keepp-to-claude-or-chatgpt
 - Machine index: https://keepp.link/llms.txt
-- Managing your page with an AI agent: https://keepp.link/blog/how-to/14-managing-your-page-with-an-ai-agent
+- Managing your page with an AI agent: https://keepp.link/blog/how-to/manage-your-page-with-an-ai-agent

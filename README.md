@@ -1,33 +1,45 @@
-# Keepp Page Skill
+# Keepp for AI agents
 
-An [Agent Skill](https://agentskills.io/specification) — packaged as a Claude Code plugin — that teaches an LLM to build and manage a **[Keepp](https://keepp.link)** page through the Keepp Agent API: adding and arranging the blocks a page is made of, writing the copy, placing products and bookings, and styling the theme.
+Build and run a **[Keepp](https://keepp.link)** page from an AI app or your own code: the blocks a page is made of, the copy, the theme, products and bookings, and payments through Stripe.
 
-The skill itself is [`plugins/keepp/skills/keepp-page/SKILL.md`](./plugins/keepp/skills/keepp-page/SKILL.md).
+There are two ways in. Most people want the first.
 
-## What it does
+## 1. Connect Keepp as an MCP server (recommended)
 
-A Keepp page is an ordered list of blocks on a two-column grid — links, cards, headers, text, profile, social icons, forms, maps, YouTube videos, menus, tickers, products, and bookings. Given a Keepp Pro API key, an agent using this skill can:
+Keepp runs a remote MCP server at:
 
-- **Build and edit the whole page** — add, remove, reorder, and restyle any block, and set the page theme (colors, roundedness, font pairing, background).
-- **Schedule blocks** to appear and disappear on their own, in the owner's time zone.
-- **Place products and bookings** the owner has created. These are read-only to the agent: it can put them on the page, but it can never create one or publish a price the owner didn't set.
+```
+https://api.keepp.link/mcp
+```
 
-It also teaches the *judgment* behind these — when a plain link beats a product card, when a page has grown long enough to need sections and nav tabs, when an on-page form converts better than a link to one — and the one rule that matters most: a write replaces the whole page, so always read it first and send every block back.
+Add it to any app that supports MCP connectors, sign in with your Keepp account, approve what the app can do, and ask for what you want. There's no key to copy. The server carries its own guidance on building a good page, and it can create pages, products and bookable offerings, connect Stripe, Google Calendar and Zoom, and restyle the theme.
 
-## Requirements
+### Claude Code (this plugin)
 
-A **Keepp Pro** API key (looks like `keepp_live_…`). Generate one in your Keepp dashboard under **AI Agent**. Base URL: `https://api.keepp.link`.
-
-## Install
-
-### Claude Code (plugin)
-
-This repo is a Claude Code plugin marketplace. Add it and install the plugin:
+This repo is a Claude Code plugin marketplace, and the plugin connects the Keepp MCP server for you:
 
 ```shell
 /plugin marketplace add thinslatelabs/keepp-skill
 /plugin install keepp@keepp
 ```
+
+Then run `/mcp`, pick **keepp**, and sign in in the browser window that opens. On a machine with no browser, Claude Code prints the sign-in link instead.
+
+Without the plugin, the same thing is one command:
+
+```shell
+claude mcp add --transport http keepp https://api.keepp.link/mcp
+```
+
+### Claude, ChatGPT and other apps
+
+Step-by-step for each: [Connect Keepp to Claude, ChatGPT or any AI app](https://keepp.link/blog/how-to/connect-keepp-to-claude-or-chatgpt).
+
+## 2. The HTTP API with an API key
+
+For scripts, scheduled jobs and custom agents where nobody is there to sign in. Generate a key in your Keepp dashboard under **AI Agent** (it looks like `keepp_live_…`). The API reads and replaces your whole page and lists what your page can reference.
+
+The skill in this repo, [`plugins/keepp/skills/keepp-page/SKILL.md`](./plugins/keepp/skills/keepp-page/SKILL.md), teaches an agent that API: authentication, the read-then-replace loop, images, errors, and where to fetch the block vocabulary and page-building guidance. If the MCP tools are available in a session, the skill tells the agent to use those instead.
 
 ### Other agent runtimes
 
@@ -38,9 +50,9 @@ git clone https://github.com/thinslatelabs/keepp-skill.git /tmp/keepp-skill
 cp -r /tmp/keepp-skill/plugins/keepp/skills/keepp-page ~/.agents/skills/keepp-page
 ```
 
-### Any LLM / assistant
+### Any LLM or assistant
 
-No skills directory needed — just hand it the skill contents, either by pasting the `SKILL.md` or pointing it at the raw file:
+Hand it the skill contents, either by pasting `SKILL.md` or pointing it at the raw file:
 
 ```
 https://raw.githubusercontent.com/thinslatelabs/keepp-skill/main/plugins/keepp/skills/keepp-page/SKILL.md
@@ -48,7 +60,7 @@ https://raw.githubusercontent.com/thinslatelabs/keepp-skill/main/plugins/keepp/s
 
 ## Learn more
 
-- Developer docs (full REST reference): https://keepp.link/developers
+- Developer docs: https://keepp.link/developers
 - Machine index: https://keepp.link/llms.txt
 
 ## License

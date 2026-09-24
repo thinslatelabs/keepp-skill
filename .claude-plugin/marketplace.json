@@ -1,5 +1,6 @@
 {
   "name": "keepp",
+  "description": "Keepp for Claude Code: build and run a Keepp page through the Keepp MCP server.",
   "owner": {
     "name": "ThinSlate Labs",
     "url": "https://keepp.link"
@@ -8,7 +9,7 @@
     {
       "name": "keepp",
       "source": "./plugins/keepp",
-      "description": "Build and manage a whole Keepp page — blocks, layout, and theme — via the Keepp Agent API."
+      "description": "Build and run a Keepp page (blocks, theme, products, bookings, Stripe) through the Keepp MCP server, with a skill for the HTTP API route."
     }
   ]
 }
