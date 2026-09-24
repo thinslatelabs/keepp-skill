@@ -69,7 +69,7 @@ vocabulary and the guidance on composing a page are published, and both are deri
 product itself rather than maintained by hand:
 
 ```
-GET https://keepp.link/api/v1/capabilities     (public, no key needed)
+GET https://api.keepp.link/api/v1/capabilities    (public, no key needed)
 ```
 
 It returns two things:
