@@ -89,6 +89,13 @@ It returns two things:
 Read it before building a page. An earlier version of this file carried its own copy of all of
 that, and the copy drifted from the product — which is why it now lives in one place.
 
+### Chat
+
+This API can place a `chat` block, but it cannot switch chat on or change its settings: the owner
+does that in **Chat → Settings** in the dashboard (or through the MCP server's
+`update_chat_settings`). Until chat is on, visitors don't see the chat button, so say so after
+adding the block. Chat needs the Influencer plan.
+
 ## Images
 
 Send a public `https://` image URL in `mediaUrls`, `imageUrl`, or `iconUrl` and the server fetches and stores it. Paths already starting with `/uploads/` are stored — **send those back unchanged**.

@@ -1,6 +1,6 @@
 # Keepp for AI agents
 
-Build and run a **[Keepp](https://keepp.link)** page from an AI app or your own code: the blocks a page is made of, the copy, the theme, products and bookings, and payments through Stripe.
+Build and run a **[Keepp](https://keepp.link)** page from an AI app or your own code: the blocks a page is made of, the copy, the theme, products and bookings, payments through Stripe, and chat.
 
 There are two ways in. Most people want the first.
 
@@ -12,7 +12,7 @@ Keepp runs a remote MCP server at:
 https://api.keepp.link/mcp
 ```
 
-Add it to any app that supports MCP connectors, sign in with your Keepp account, approve what the app can do, and ask for what you want. There's no key to copy. The server carries its own guidance on building a good page, and it can create pages, products and bookable offerings, connect Stripe, Google Calendar and Zoom, and restyle the theme.
+Add it to any app that supports MCP connectors, sign in with your Keepp account, approve what the app can do, and ask for what you want. There's no key to copy. The server carries its own guidance on building a good page, and it can create pages, products and bookable offerings, connect Stripe, Google Calendar and Zoom, restyle the theme, and set up chat on the page: switch it on, choose who answers, write what the AI should know, and walk you through linking the Telegram group you answer chats in.
 
 ### Claude Code (this plugin)
 

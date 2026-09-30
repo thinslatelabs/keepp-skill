@@ -9,7 +9,7 @@
     {
       "name": "keepp",
       "source": "./plugins/keepp",
-      "description": "Build and run a Keepp page (blocks, theme, products, bookings, Stripe) through the Keepp MCP server, with a skill for the HTTP API route."
+      "description": "Build and run a Keepp page (blocks, theme, products, bookings, Stripe, chat) through the Keepp MCP server, with a skill for the HTTP API route."
     }
   ]
 }
