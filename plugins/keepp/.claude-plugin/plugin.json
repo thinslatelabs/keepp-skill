@@ -1,7 +1,7 @@
 {
   "name": "keepp",
-  "description": "Build a link-in-bio page or small business website with Keepp from Claude Code: sell with Stripe checkout, take bookings, collect leads and set up chat by asking. Connects the Keepp MCP server (sign in once, no key), plus a skill for the HTTP API route.",
-  "version": "2.1.1",
+  "description": "Build a small business website or link-in-bio page with Keepp from Claude Code: sell with Stripe checkout, take bookings, collect leads and set up chat by asking. Connects the Keepp MCP server (sign in once, no key), plus a skill for the HTTP API route.",
+  "version": "2.1.2",
   "author": {
     "name": "ThinSlate Labs",
     "url": "https://keepp.link"
@@ -10,12 +10,13 @@
   "license": "MIT",
   "keywords": [
     "keepp",
-    "link-in-bio",
     "website-builder",
     "small-business-website",
     "creator-website",
+    "link-in-bio",
     "online-store",
     "booking",
+    "live-chat",
     "mcp",
     "agent",
     "api"

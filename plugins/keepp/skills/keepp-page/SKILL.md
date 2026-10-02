@@ -1,6 +1,6 @@
 ---
 name: keepp-page
-description: Use when a user wants to build or manage their Keepp page (Keepp is a link-in-bio and website builder with a store, bookings and forms) through the Keepp HTTP API with an API key (keepp_live_…) — typically from a script, a scheduled job or a custom agent. If Keepp's MCP tools (get_page, put_page, list_catalog and the rest) are available in this session, use those instead of this skill.
+description: Use when a user wants to build or manage their Keepp page (Keepp is a website and link-in-bio builder with a store, bookings, forms and chat) through the Keepp HTTP API with an API key (keepp_live_…) — typically from a script, a scheduled job or a custom agent. If Keepp's MCP tools (get_page, put_page, list_catalog and the rest) are available in this session, use those instead of this skill.
 ---
 
 # Building a Keepp Page
