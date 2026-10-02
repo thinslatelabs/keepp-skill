@@ -1,6 +1,8 @@
 # Keepp for AI agents
 
-Build and run a **[Keepp](https://keepp.link)** page from an AI app or your own code: the blocks a page is made of, the copy, the theme, products and bookings, payments through Stripe, and chat.
+**[Keepp](https://keepp.link)** is a link-in-bio and website builder for creators and small businesses: one page at keepp.link/yourname with your links, a store with Stripe checkout, bookings, forms and chat. Free to start.
+
+This repo lets you build and run that page from an AI app or your own code: the blocks a page is made of, the copy, the theme, products and bookings, payments through Stripe, and chat.
 
 There are two ways in. Most people want the first.
 

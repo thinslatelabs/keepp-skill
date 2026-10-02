@@ -1,6 +1,6 @@
 {
   "name": "keepp",
-  "description": "Keepp for Claude Code: build and run a Keepp page through the Keepp MCP server.",
+  "description": "Keepp for Claude Code. Keepp is a link-in-bio and website builder for creators and small businesses; build your page, store and bookings from Claude.",
   "owner": {
     "name": "ThinSlate Labs",
     "url": "https://keepp.link"
@@ -9,7 +9,7 @@
     {
       "name": "keepp",
       "source": "./plugins/keepp",
-      "description": "Build and run a Keepp page (blocks, theme, products, bookings, Stripe, chat) through the Keepp MCP server, with a skill for the HTTP API route."
+      "description": "Build a link-in-bio page or small business website with Keepp from Claude Code: a store with Stripe checkout, bookings, forms and chat, through the Keepp MCP server, with a skill for the HTTP API route."
     }
   ]
 }
